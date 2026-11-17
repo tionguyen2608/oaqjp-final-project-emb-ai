@@ -1,0 +1,25 @@
+name: Validate Emotion Detector
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run unit tests with mocked upstream responses
+        run: python -m unittest test_unit -v
+      - name: Static code analysis
+        run: pylint server.py
+      - name: Run live Watson integration tests
+        run: python -m unittest test_emotion_detection -v
